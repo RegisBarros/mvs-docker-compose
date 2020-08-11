@@ -1,0 +1,51 @@
+version: "3"  
+
+services:  
+  mongo-express:  
+    image: mongo-express  
+    ports:  
+      - 8081:8081  
+    environment:  
+      ME_CONFIG_BASICAUTH_USERNAME: mvs  
+      ME_CONFIG_BASICAUTH_PASSWORD: mvs@123  
+      ME_CONFIG_MONGODB_PORT: 27017  
+    links:  
+      - mongo  
+    networks:  
+      - mvs-network
+
+  mongo:  
+    image: mongo  
+    ports:  
+      - "27017:27017"  
+    volumes:  
+      - /home/regis/data/volumes/MongoDB:/data/db  
+    networks:  
+      - mvs-network  
+  
+  redis:  
+    image: redis  
+    command: redis-server  
+    ports:  
+      - "6379:6379"
+  
+  mssql:
+    image: mvs-mssql
+    build:
+      context: ./docker-mssql
+      dockerfile: Dockerfile
+    ports:
+      - 1433:1433
+    networks:
+      - mvs-network
+    volumes:
+      - mvs-data:/var/opt/mssql/data
+
+volumes:
+  mvs-data:
+    external: false
+    driver: local
+      
+networks:
+  mvs-network:  
+    driver: bridge  
